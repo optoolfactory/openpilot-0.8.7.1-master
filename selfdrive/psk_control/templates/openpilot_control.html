@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+
+<meta charset="UTF-8" />
+<title>Openpilot Control</title>
+
+<meta name="viewport" content="width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0" />
+<meta name="format-detection" content="telephone=no" />
+
+<style>
+body {
+  background-color: black;
+  text-align: center;
+  color: white;
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+input[type=button], input[type=submit], input[type=reset] {
+  background-color: #4CAF50;
+  width: 45%;
+  border: none;
+  color: white;
+  padding: 15px 30px;
+  text-align: center;
+  text-decoration: none;
+  font-size: 20px;
+  margin: 4px 2px;
+  cursor: pointer;
+}
+
+input[type=text] {
+  width: 40%;
+  height: 18%;
+  font-size: 20px;
+  padding: 12px 20px;
+  margin: 8px 0;
+  box-sizing: border-box;
+}
+</style>
+
+<script type="text/javascript">
+
+	function load()
+	{
+		//document.frm1.submit()
+		//alert("test")
+		var gap = {{gapParam}};
+		if( gap == 0 ) {
+			document.frm1.chk_distance[0].checked = true;
+		}else if( gap == 1 ) {
+			document.frm1.chk_distance[1].checked = true;
+		}else if( gap == 2 ) {
+			document.frm1.chk_distance[2].checked = true;
+		}else if( gap == 3 ) {
+			document.frm1.chk_distance[3].checked = true;
+		}else if( gap == 4 ) {
+			document.frm1.chk_distance[4].checked = true;
+		}
+		
+		var accel = {{accelParam}};
+		if( accel == 0 ) {
+			document.frm1.chk_accel[0].checked = true;
+		}else if( accel == 1 ) {
+			document.frm1.chk_accel[1].checked = true;
+		}else if( accel == 2 ) {
+			document.frm1.chk_accel[2].checked = true;
+		}
+
+		//var curv = {{curvParam}};
+		//if( curv == 0.5 ) {
+		//	document.frm1.chk_curv[0].checked = true;
+		//}else if( curv == 1.0 ) {
+		//	document.frm1.chk_curv[1].checked = true;
+		//}else if( curv == 1.5 ) {
+		//	document.frm1.chk_curv[2].checked = true;
+		//}
+		document.frm1.curv.value = {{curvParam}};
+
+		var acc = {{accParam}};
+		if( acc == 0 ) {
+			document.frm1.chk_acc[0].checked = true;
+		}else {
+			document.frm1.chk_acc[1].checked = true;
+		}
+
+		document.frm1.lad.value = {{ladParam}};
+
+		document.frm1.lat.value = {{latParam}};
+
+		//document.getElementById("lead_accel_tau").value = 1
+		//document.getElementById("steer_ratio").value = 2
+		//document.getElementById("camera_offset_adjust").value = 3
+		//document.getElementById("stiffness_factor").value = 4
+	}
+
+    function apply_ok() {     
+		//document.getElementById("autoSubmit").click(); // Simulates button click
+        //document.submitForm.submit(); // Submits the form without the button
+		//var gap = document.frm1.chk_distance.value
+		//var accel = document.frm1.chk_accel.value
+		document.frm1.action = "/apply";
+        document.frm1.method = "post";
+        document.frm1.submit();
+    }
+
+    function delHangle(evt){ //한글을 지우는 부분, keyup부분에 넣어준다.
+		var objTarget = evt.srcElement || evt.target;
+		var _value = event.srcElement.value;
+		if(/[ㄱ-ㅎㅏ-ㅡ가-핳]/g.test(_value)) {
+			// objTarget.value = objTarget.value.replace(/[ㄱ-ㅎㅏ-ㅡ가-핳]/g,'');
+			objTarget.value = null;
+			//return false;
+		}
+	}
+
+	function isNumberKey(evt) { // 숫자를 제외한 값을 입력하지 못하게 한다.
+		var charCode = (evt.which) ? evt.which : event.keyCode;
+		// Textbox value
+		var _value = event.srcElement.value;
+		if (event.keyCode < 48 || event.keyCode > 57) {
+			if (event.keyCode != 46) { //숫자와 . 만 입력가능하도록함
+				return false;
+			}
+		}
+
+		// 소수점(.)이 두번 이상 나오지 못하게
+		var _pattern0 = /^\d*[.]\d*$/; // 현재 value값에 소수점(.) 이 있으면 . 입력불가
+		if (_pattern0.test(_value)) {
+			if (charCode == 46) {
+				return false;
+			}
+		}
+
+		// 두자리 이하의 숫자만 입력가능
+		var _pattern1 = /^\d{2}$/; // 현재 value값이 2자리 숫자이면 . 만 입력가능
+		// {숫자}의 값을 변경하면 자리수를 조정할 수 있다.
+		if (_pattern1.test(_value)) {
+			if (charCode != 46) {
+				alert("두자리 이하의 숫자만 입력가능합니다");
+				return false;
+			}
+		}
+
+		// 소수점 둘째자리까지만 입력가능
+		var _pattern2 = /^\d*[.]\d{2}$/; // 현재 value값이 소수점 둘째짜리 숫자이면 더이
+		// {숫자}의 값을 변경하면 자리수를 조정할 수 있다.
+		if (_pattern2.test(_value)) {
+			alert("소수점 둘째자리까지만 입력가능합니다.");
+			return false;
+		}
+		return true;
+	}
+</script>
+	
+</head>
+<body onload="load()">
+	<form name="frm1" id="frm1" action="" method="post">
+		<h2>Openpilot Control</h2>
+
+		<div align="center">
+			<input type="button" value="APPLY" onclick="apply_ok()">
+			<input type="button" value="RESET" onclick="load()">
+		</div>
+
+		<h4>
+		<p>
+			<font color="GREEN">ADAPTIVE CRUISE</font>
+			<br><input type="radio" name="chk_acc" value=0>True
+			&nbsp;&nbsp;&nbsp;&nbsp;<input type="radio" name="chk_acc" value=1>False
+		</p>
+		</h4>
+
+		<h4>
+		<p>
+			<font color="GREEN">GAP(seconds)</font>
+			<br><input type="radio" name="chk_distance" value=0>AUTO
+			<br><input type="radio" name="chk_distance" value=1>1.3
+			&nbsp;&nbsp;<input type="radio" name="chk_distance" value=2>1.6
+			&nbsp;&nbsp;<input type="radio" name="chk_distance" value=3>2.0
+			&nbsp;&nbsp;<input type="radio" name="chk_distance" value=4>2.5
+			
+		</p>
+		</h4>
+
+		<h4>
+		<p>
+			<font color="GREEN">ACCEL MODE</font>
+			<br><input type="radio" name="chk_accel" value=0>ECO
+			&nbsp;&nbsp;<input type="radio" name="chk_accel" value=1>NORMAL
+			&nbsp;&nbsp;<input type="radio" name="chk_accel" value=2>SPORT
+		</p>
+		</h4>
+
+		<h4>
+		<p>
+			<font color="GREEN">SCC CURVATURE FACTOR (0.5 ~ 1.5)</font>
+			<!--<br><input type="radio" name="chk_curv" value=0.5>0.5
+			<br><input type="radio" name="chk_curv" value=1.0>1.0
+			<br><input type="radio" name="chk_curv" value=1.5>1.5-->
+			<input type="text" name="curv" onkeypress="return isNumberKey(event)" onkeyup="return delHangle(event)">
+		</p>
+		</h4>
+
+		<h4>
+		<p>
+			<font color="GREEN">LONGITUDINAL ACTUATOR DELAY (0.1 ~ 1.5)</font>
+			<!--<br><input type="radio" name="chk_curv" value=0.1>0.1
+			<br><input type="radio" name="chk_curv" value=0.2>0.2
+			<br><input type="radio" name="chk_curv" value=1.5>1.5-->
+			<br><input type="text" name="lad" onkeypress="return isNumberKey(event)" onkeyup="return delHangle(event)">
+		</p>
+		</h4>
+
+		<h4>
+		<p>
+			<font color="GREEN">LEAD ACCEL TAU (1.5 ~ 10.0)</font>
+			<br>리드 감속이 클수록 계속 감속<br>
+			<input type="text" name="lat" onkeypress="return isNumberKey(event)" onkeyup="return delHangle(event)">
+		</p>
+		</h4>
+
+
+	</form>
+</body>
+</html>
